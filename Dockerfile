@@ -1,6 +1,8 @@
-FROM python:3.9
+FROM python:latest
 
-WORKDIR /app
+ENV PYTHONUNBUFFERED 1
+
+WORKDIR /app/fast_api
 
 COPY requirements.txt .
 

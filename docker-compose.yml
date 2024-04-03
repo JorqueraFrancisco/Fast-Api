@@ -14,13 +14,13 @@ services:
     # depends_on:
     #   - mysql
 
-  # mysql:
-  #   image: mysql:latest
-  #   restart: always
-  #   environment:
-  #     MYSQL_DATABASE: test
-  #     MYSQL_USER: user
-  #     MYSQL_PASSWORD: user
-  #     MYSQL_ROOT_PASSWORD: user
-  #   ports:
-  #     - "3306:3306"
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+      MYSQL_ROOT_PASSWORD: user
+    ports:
+      - "3306:3306"
