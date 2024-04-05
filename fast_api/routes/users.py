@@ -1,18 +1,47 @@
-from fastapi import APIRouter
+from fastapi import (
+    Depends,
+    HTTPException,
+    APIRouter
+)
+from users.schemas import (
+    UserCreate,
+    User
+)
+from sqlalchemy.orm import Session
+from config.database import SessionLocal, engine
+from users import models
+from users import crud
 
+models.Base.metadata.create_all(bind=engine)
 router = APIRouter()
 
 
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 @router.get("/users/", tags=["users"])
-async def read_users():
-    return [{"username": "Rick"}, {"username": "Morty"}]
+async def read_users(db: Session = Depends(get_db)):
+    users = crud.get_users(db)
+    return users
 
 
-@router.get("/users/me", tags=["users"])
-async def read_user_me():
-    return {"username": "fakecurrentuser"}
+@router.get("/users/{user_id}", tags=["users"])
+async def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = crud.get_user(db, user_id)
+    if not user:
+        raise HTTPException(status_code=400, detail="user not found")
+    return user
 
 
-@router.get("/users/{username}", tags=["users"])
-async def read_user(username: str):
-    return {"username": username}
+@router.post("/users/", response_model=User)
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return crud.create_user(db=db, user=user)
