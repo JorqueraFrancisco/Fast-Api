@@ -8,21 +8,12 @@ from users.schemas import (
     User
 )
 from sqlalchemy.orm import Session
-from config.database import SessionLocal, engine
-from users import models
-from users import crud
+from config.database import engine, get_db
+from users import models, crud
+
 
 models.Base.metadata.create_all(bind=engine)
 router = APIRouter()
-
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.get("/users/", tags=["users"])
@@ -39,7 +30,7 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
     return user
 
 
-@router.post("/users/", response_model=User)
+@router.post("/users/", response_model=User, tags=["users"])
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:

@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer, String, Boolean
-
+from sqlalchemy.orm import relationship
 from config.database import Base
 
 
 class User(Base):
-    __tablename__ = 'User'
+    __tablename__ = 'users'
 
     user_id = Column(
         Integer,
@@ -28,3 +28,4 @@ class User(Base):
         Boolean,
         default=True
     )
+    orders = relationship("Order", back_populates="user")
